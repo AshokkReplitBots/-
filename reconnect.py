@@ -7,9 +7,9 @@ import psutil
 # BOT SETTINGS #
 bot_file_name = "musicbot"
 bot_class_name = "xenoichi"
-room_id = "6734a2767752b4b0c66f796a"
+room_id = "67391339026fa6a14c90bd2b"
 #65c56b54ac42f2f98821e501
-bot_token = ""
+bot_token = "7d9dcd06eb955320598b95e5b3aa76db8a8b2db19e31c295225c2b6062b7c110"
 
 def terminate_ffmpeg_processes():
     for proc in psutil.process_iter(['pid', 'name']):
