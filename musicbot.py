@@ -764,8 +764,8 @@ class xenoichi(BaseBot):
     async def stream_to_radioking(self, mp3_file_path):
         icecast_server = "live.radioking.com"
         icecast_port = 80
-        mount_point = "/myradio01"
-        username = "Jack_Cole"
+        mount_point = "/radioshok"
+        username = "dosecis_dosecis"
         password = ""
         icecast_url = f"icecast://{username}:{password}@{icecast_server}:{icecast_port}{mount_point}"
 
