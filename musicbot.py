@@ -11,7 +11,7 @@ import string
 import time
 import glob
 
-class xenoichi(BaseBot):
+class JellyJell00(BaseBot):
     def __init__(self):
         super().__init__()
 
@@ -25,7 +25,7 @@ class xenoichi(BaseBot):
         self.currently_playing_title = None
         self.credits = self.load_credits()  # Load credits from file
         self.user_song_count = {}
-        self.admins = {'Xenoichi'}
+        self.admins = {'Miwiii','iMooseMoo'}
         self.bot_pos = None
         self.ctoggle = False
         self.is_loading = True
@@ -73,14 +73,14 @@ class xenoichi(BaseBot):
 
     async def on_chat(self, user: User, message: str) -> None:
 
-        if message.startswith('/ctoggle') and user.username in self.admins:
+        if message.startswith('!credit') and user.username in self.admins:
 
             self.ctoggle = not self.ctoggle
             status = "enabled" if self.ctoggle else "disabled"
             await self.highrise.chat(f"Credits requirement has been {status}.")
             self.save_loc_data()
 
-        if message.startswith("/refresh"):
+        if message.startswith("!refresh"):
             # Check if the user is in the admin list
             if user.username not in self.admins:
                 return
@@ -98,14 +98,14 @@ class xenoichi(BaseBot):
 
             # Raise a RuntimeError to crash the bot intentionally
             raise RuntimeError("Intentional crash triggered by admin")
-        
-        if message.startswith("/shutdown"):
+
+        if message.startswith("!shutdown"):
             # Check if the user is in the admin list
             if user.username not in self.admins:
                 return
-            
+
             if self.is_loading:
-                await self.highrise.chat("The bot is still initializing. Please wait a moment before using the /shutdown command.")
+                await self.highrise.chat("The bot is still initializing. Please wait a moment before using the !shutdown command.")
                 return
 
             # Allow admins to "crash" the bot
@@ -129,7 +129,7 @@ class xenoichi(BaseBot):
 
             os._exit(0)
 
-        elif message.startswith("/setpos"):
+        elif message.startswith("!mbot"):
 
             if not self.is_admin(user.username):
                 return
@@ -142,7 +142,7 @@ class xenoichi(BaseBot):
             await self.highrise.teleport(self.highrise.my_id, self.bot_pos)
             self.save_loc_data()
 
-        elif message.startswith('/admin '):
+        elif message.startswith('!admin '):
             if not self.is_admin(user.username):
                 return
             parts = message.split()
@@ -154,9 +154,9 @@ class xenoichi(BaseBot):
                 else:
                     await self.highrise.chat(f"@{target_user} is already an admin.")
             else:
-                await self.highrise.chat("Usage: /admin @<username>")
+                await self.highrise.chat("Usage: !admin @<username>")
 
-        elif message.startswith('/deladmin '):
+        elif message.startswith('!removeadmin '):
             if not self.is_admin(user.username):
                 return
             parts = message.split()
@@ -168,9 +168,9 @@ class xenoichi(BaseBot):
                 else:
                     await self.highrise.chat(f"@{target_user} is not an admin.")
             else:
-                await self.highrise.chat("Usage: /deladmin @<username>")
+                await self.highrise.chat("Usage: !removeadmin @<username>")
 
-        elif message.startswith('/cadmin'):
+        elif message.startswith('!adm'):
             if not self.is_admin(user.username):
                 await self.highrise.chat("Sorry, you need to be an admin to view the admin list.")
                 return
@@ -184,71 +184,71 @@ class xenoichi(BaseBot):
             await self.check_admins(page_number)
 
         # Credits logic
-        elif message.startswith('/ac '):
+        elif message.startswith('!ac '):
             if user.username not in self.admins:  # Only allow Xenoichi to add credits
                 return
-            
+
             parts = message.split()
-            
+
             if len(parts) == 3:
                 # Extract the username, ensuring it includes the '@' symbol
                 target_user = parts[1]
-                
+
                 # Remove the '@' symbol if it's there
                 if target_user.startswith('@'):
                     target_user = target_user[1:]
                 else:
                     await self.highrise.chat("Invalid username format. Please include '@' before the username.")
                     return
-                
+
                 try:
                     amount = int(parts[2])
                     await self.add_credits(target_user, amount)
                 except ValueError:
                     await self.highrise.chat("Invalid amount. Please provide a valid number for credits.")
             else:
-                await self.highrise.chat("Usage: /ac @<username> <credits>")
+                await self.highrise.chat("Usage: !ac @<username> <credits>")
 
-        elif message.startswith('/rc '):
+        elif message.startswith('!rc '):
             # Remove credits from a user
             if user.username not in self.admins:
                 return
-            
+
             parts = message.split()
-            
+
             if len(parts) == 3:
                 target_user = parts[1]
-                
+
                 # Remove the '@' symbol if it's there
                 if target_user.startswith('@'):
                     target_user = target_user[1:]
                 else:
                     await self.highrise.chat("Invalid username format. Please include '@' before the username.")
                     return
-                
+
                 try:
                     amount = int(parts[2])
                     await self.remove_credits(target_user, amount)
                 except ValueError:
                     await self.highrise.chat("Invalid amount. Please provide a valid number for credits.")
             else:
-                await self.highrise.chat("Usage: /rc @<username> <credits>")
+                await self.highrise.chat("Usage: !rc @<username> <credits>")
 
         elif message.startswith('/cc'):
             await self.check_credits(user.username)
 
-        elif message.startswith('/cac'):
+        elif message.startswith('!cac'):
 
             if user.username not in self.admins:
                 return
-    
+
             parts = message.split()
 
             if len(parts) == 1:
                 # No confirmation code provided, generate a new one
                 if user.username in self.pending_confirmations:
                     confirmation_code = self.pending_confirmations[user.username]
-                    await self.highrise.chat(f"You already have a pending confirmation.\n\n Type '/cac {confirmation_code}' to confirm.")
+                    await self.highrise.chat(f"You already have a pending confirmation.\n\n Type '!cac {confirmation_code}' to confirm.")
                     return
 
                 # Generate a new random 5-letter confirmation code
@@ -270,13 +270,13 @@ class xenoichi(BaseBot):
                 else:
                     await self.highrise.chat("You have no pending actions to confirm.")
 
-        elif message.startswith('/play '):
+        elif message.startswith('!play '):
 
             if self.is_loading:
                 await self.highrise.chat("The bot is still initializing. Please wait a moment before using the /play command.")
                 return
-            
-            song_request = message[len('/play '):].strip()
+
+            song_request = message[len('!play '):].strip()
 
             # Check if the user has already queued 3 songs
             if self.user_song_count.get(user.username, 0) >= 3:
@@ -286,17 +286,17 @@ class xenoichi(BaseBot):
             if self.ctoggle:
                 # Get the user's current credits from self.credits
                 user_credits = self.credits.get(user.username, 0)  # Default to 0 if the user is not found
-                
+
                 if user_credits <= 0:
                     await self.highrise.chat(f"@{user.username}, you need at least 1 credit to queue a song.")
                     return
-                
+
             await self.add_to_queue(song_request, user.username)
 
-        elif message.startswith('/skip'):
+        elif message.startswith('!skip'):
             await self.skip_song(user)  # Pass user.username to the skip_song method
 
-        elif message.startswith('/delq'):
+        elif message.startswith('!delq'):
 
             parts = message.split()
 
@@ -304,7 +304,7 @@ class xenoichi(BaseBot):
                 # Call the del_last_song function to delete the user's last song
                 await self.del_last_song(user.username)
 
-        elif message.startswith('/clearq') and user.username in self.admins:
+        elif message.startswith('!clearq') and user.username in self.admins:
 
             parts = message.split()
 
@@ -312,7 +312,7 @@ class xenoichi(BaseBot):
                 # Call the clear_queue function to remove all songs from the user's queue and delete the files
                 await self.clear_queue()
 
-        elif message.startswith('/q'):
+        elif message.startswith('!q'):
             page_number = 1
             try:
                 page_number = int(message.split(' ')[1])
@@ -320,7 +320,7 @@ class xenoichi(BaseBot):
                 pass
             await self.check_queue(page_number)
 
-        elif message.startswith('/np'):
+        elif message.startswith('!song'):
             await self.now_playing()
 
     async def on_message(self, user_id: str, conversation_id: str, is_new_conversation: bool) -> None:
@@ -330,10 +330,10 @@ class xenoichi(BaseBot):
             message = response.messages[0].content  # Get the message content
 
         # Handle the /play command
-        if message.startswith('/play '):
+        if message.startswith('!play '):
 
             if self.is_loading:
-                await self.highrise.send_message(conversation_id, "The bot is still initializing. Please wait a moment before using the /play command.")
+                await self.highrise.send_message(conversation_id, "The bot is still initializing. Please wait a moment before using the !play command.")
                 return
 
             # Get the username based on user_id
@@ -343,8 +343,8 @@ class xenoichi(BaseBot):
             if not username:
                 await self.highrise.chat(conversation_id, "Sorry, I couldn't find your username.")
                 return
-            
-            song_request = message[len('/play '):].strip()
+
+            song_request = message[len('!play '):].strip()
 
             # Check if the user has already queued 3 songs
             if self.user_song_count.get(username, 0) >= 3:
@@ -354,11 +354,11 @@ class xenoichi(BaseBot):
             if self.ctoggle:
                 # Check if the user has enough credits
                 user_credits = self.credits.get(username, 0)  # Default to 0 if the user is not found
-                
+
                 if user_credits <= 0:
                     await self.highrise.send_message(conversation_id, "You need at least 1 credit to queue a song.")
                     return
-            
+
             # Add the song to the queue with the username as the requester
             await self.add_to_queue(song_request, username)
             await self.highrise.send_message(conversation_id, f"@{username}, your song '{song_request}' has been added to the queue!")
@@ -368,7 +368,7 @@ class xenoichi(BaseBot):
         admins_per_page = 5  # How many admins per page
         admins_list = list(self.admins)
         total_pages = (len(admins_list) // admins_per_page) + (1 if len(admins_list) % admins_per_page != 0 else 0)
-        
+
         if page_number > total_pages:
             await self.highrise.chat(f"Page {page_number} does not exist. Only {total_pages} pages of admins.")
             return
@@ -376,7 +376,7 @@ class xenoichi(BaseBot):
         start_index = (page_number - 1) * admins_per_page
         end_index = min(start_index + admins_per_page, len(admins_list))
         admins_page = admins_list[start_index:end_index]
-        
+
         # Display the admins on this page with numbers instead of '@'
         admins_message = f"Page {page_number}/{total_pages}:\nAdmins:\n"
         admins_message += "\n".join([f"{index + 1}. {admin}" for index, admin in enumerate(admins_page)])
@@ -464,7 +464,7 @@ class xenoichi(BaseBot):
         await self.highrise.chat(queue_message)
 
         if page_number < total_pages:
-            await self.highrise.chat(f"Use '/q {page_number + 1}' to view the next page.")
+            await self.highrise.chat(f"Use '!q {page_number + 1}' to view the next page.")
 
 
     async def add_to_queue(self, song_request, owner):
@@ -475,10 +475,10 @@ class xenoichi(BaseBot):
         if self.user_song_count.get(owner, 0) >= 3:
             await self.highrise.chat(f"@{owner}, you can only queue a maximum of 3 songs.")
             return
-        
+
         # Download the song details (file path and title)
         file_path, title, duration = await self.download_youtube_audio(song_request)
-        
+
         if file_path and title and duration:
 
             # **Check if the song exceeds the duration limit**
@@ -493,7 +493,7 @@ class xenoichi(BaseBot):
             if any(song['title'].lower() == title.lower() for song in self.song_queue):
                 await self.highrise.chat(f"@{owner}, the song '{title}' is already in the queue.")
                 return
-            
+
             # Check if the requested song is the same as the current playing song
             if self.currently_playing_title and self.currently_playing_title.lower() == title.lower():
                 await self.highrise.chat(f"@{owner}, the song '{title}' is already playing. Please wait for it to finish.")
@@ -594,7 +594,7 @@ class xenoichi(BaseBot):
                 info = ydl.extract_info(song_request, download=True)
                 if 'entries' in info:
                     info = info['entries'][0]
-                
+
                 video_id = info['id']
                 title = info['title']
                 duration = info['duration']  # Duration in seconds
@@ -612,7 +612,7 @@ class xenoichi(BaseBot):
         if self.current_song is None:
             await self.highrise.chat("No song is currently playing.")
             return
-        
+
         if self.currently_playing_title:
             current_song = self.current_song
             total_duration = current_song.get('duration', 0)
@@ -728,10 +728,10 @@ class xenoichi(BaseBot):
             # Ensure the user exists in the song count dictionary
             if song_owner not in self.user_song_count:
                 self.user_song_count[song_owner] = 0  # Initialize if user is not in the dictionary
-            
+
             # Decrease the song count for the user who requested the song
             self.user_song_count[song_owner] -= 1
-            
+
             await asyncio.sleep(10)
             await self.play_next_song()
         else:
@@ -751,8 +751,10 @@ class xenoichi(BaseBot):
                 print(f"MP3 file {mp3_file_path} already exists. Skipping conversion.")
                 return mp3_file_path  # Return the existing MP3 file path
 
+            # Specify the full path to ffmpeg executable
+            ffmpeg_path = 'ffmpeg'  # or wherever your ffmpeg is located
             subprocess.run([
-                'ffmpeg', '-i', audio_file_path,
+                ffmpeg_path, '-i', audio_file_path,
                 '-acodec', 'libmp3lame', '-ab', '192k', '-ar', '44100', '-ac', '2', mp3_file_path
             ], check=True)
 
@@ -764,9 +766,9 @@ class xenoichi(BaseBot):
     async def stream_to_radioking(self, mp3_file_path):
         icecast_server = "live.radioking.com"
         icecast_port = 80
-        mount_point = "/radioshok"
-        username = "dosecis_dosecis"
-        password = ""
+        mount_point = "/bot-radio2"
+        username = "LAR_LAR"
+        password = "33199108"
         icecast_url = f"icecast://{username}:{password}@{icecast_server}:{icecast_port}{mount_point}"
 
         with ThreadPoolExecutor() as executor:
@@ -775,7 +777,7 @@ class xenoichi(BaseBot):
             await asyncio.get_event_loop().run_in_executor(None, future.result)
 
     def _run_ffmpeg(self, mp3_file_path, icecast_url):
-            
+
         command = [
             'ffmpeg', '-y', '-re', '-i', mp3_file_path,
             '-f', 'mp3', '-acodec', 'libmp3lame', '-ab', '192k',
@@ -850,7 +852,7 @@ class xenoichi(BaseBot):
             print("No active stream to stop.")
 
     async def musicbot_dance(self):
-        
+
         while True:
 
             try:
@@ -888,7 +890,7 @@ class xenoichi(BaseBot):
     async def get_actual_pos(self, user_id):
 
         room_users = await self.highrise.get_room_users()
-        
+
         for user, position in room_users.content:
             if user.id == user_id:
                 return position
@@ -937,6 +939,7 @@ class xenoichi(BaseBot):
         except Exception as e:
             print(f"Error fetching user details: {str(e)}")
             return None
+
 
 
 
